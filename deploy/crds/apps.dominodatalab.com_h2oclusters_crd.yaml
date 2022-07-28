@@ -1,0 +1,23 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: h2oclusters.apps.dominodatalab.com
+  namespace: domino-compute
+spec:
+  group: apps.dominodatalab.com
+  names:
+    kind: H2oCluster
+    listKind: H2oClusterList
+    plural: h2oclusters
+    singular: h2ocluster
+  scope: Namespaced
+  versions:
+  - name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        type: object
+        x-kubernetes-preserve-unknown-fields: true
+    served: true
+    storage: true
+    subresources:
+      status: {}

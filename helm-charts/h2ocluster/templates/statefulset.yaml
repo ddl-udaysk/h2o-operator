@@ -1,0 +1,75 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "chart.fullname" . }}
+  labels:
+{{ include "chart.labels" . | indent 4 }}
+    app.kubernetes.io/component: node
+  namespace: {{ .Release.Namespace }}
+spec:
+  podManagementPolicy: Parallel
+  serviceName: h2o-service
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: node
+      app.kubernetes.io/instance: h2o-{{ .Values.runId }}
+      app.kubernetes.io/name: {{ include "chart.name" . }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: node
+{{ include "chart.labels" . | indent 8 }}
+    spec:
+      imagePullSecrets:
+      - name: "domino-quay-repos"
+      containers:
+        - name: {{ .Chart.Name }}
+          volumeMounts:
+          - mountPath: /tmp
+            name: additional-storage
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          ports:
+            - name: http
+              containerPort: 54321 
+              protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /kubernetes/isLeaderNode
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 15
+            failureThreshold: 1
+          env:
+          - name: H2O_KUBERNETES_SERVICE_DNS
+            value: {{ include "chart.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local
+          - name: H2O_NODE_LOOKUP_TIMEOUT
+            value: '180'
+          - name: H2O_NODE_EXPECTED_COUNT
+            value: '{{ .Values.replicaCount }}'
+      dnsPolicy: ClusterFirst
+      nodeSelector:
+        dominodatalab.com/node-pool: {{ .Values.nodePool }}
+      restartPolicy: Always
+      securityContext:
+        fsGroup: 12574
+        runAsUser: 12574
+      terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds | default 30 }}
+      affinity: {}
+    {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+  volumeClaimTemplates:
+  - metadata:
+      name: additional-storage
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: {{ .Values.volumeSize }} 
+      storageClassName: {{ .Values.storageClassName }}

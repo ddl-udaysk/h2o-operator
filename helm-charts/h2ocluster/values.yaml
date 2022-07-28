@@ -1,0 +1,24 @@
+# Required Values
+# runId
+# hardwareTierId 
+# projectName
+# projectOwnerName
+# startingUserName
+# nodePool
+
+nodePool: default
+replicaCount: 3
+
+image:
+  repository: quay.io/domino/h2o
+  tag: 3.30.0.5
+  pullPolicy: IfNotPresent
+
+resources:
+  requests:
+    memory: "4Gi"
+
+tolerations: []
+
+volumeSize: 64Gi
+storageClassName: gp2

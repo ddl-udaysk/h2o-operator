@@ -1,0 +1,11 @@
+apiVersion: apps.dominodatalab.com/v1alpha1
+kind: H2oCluster
+metadata:
+  name: test
+  namespace: domino-compute
+spec:
+  runId: test
+  hardwareTierId: medium-k8s
+  projectName: H2OTest
+  projectOwnerName: kevin_flansburg
+  startingUserName: kevin_flansburg

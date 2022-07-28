@@ -1,0 +1,27 @@
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: h2o-operator
+  namespace: domino-platform
+subjects:
+- kind: ServiceAccount
+  name: h2o-operator
+  namespace: domino-platform
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: h2o-operator
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: h2o-operator
+  namespace: domino-compute
+subjects:
+- kind: ServiceAccount
+  name: h2o-operator
+  namespace: domino-platform
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: h2o-operator

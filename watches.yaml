@@ -1,0 +1,5 @@
+---
+- group: apps.dominodatalab.com
+  version: v1alpha1
+  kind: H2oCluster
+  chart: helm-charts/h2ocluster

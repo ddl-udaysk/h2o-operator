@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: h2o-operator
+  namespace: domino-platform
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: h2o-operator
+  template:
+    metadata:
+      labels:
+        name: h2o-operator
+    spec:
+      serviceAccountName: h2o-operator
+      containers:
+        - name: h2o-operator
+          # Replace this with the built image name
+          image: quay.io/kevin_flansburg/h2o-operator:v0.1.0-allstate
+          imagePullPolicy: Always
+          env:
+            - name: WATCH_NAMESPACE
+              value: "domino-compute"
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: OPERATOR_NAME
+              value: "h2o-operator"
