@@ -1,0 +1,36 @@
+cat << EOF >> /usr/share/chp-errors/error.html
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <script>
+        function timedRefresh(timeoutPeriod) {
+            setTimeout("location.reload(true);",timeoutPeriod);
+        }
+    </script>
+    <title>Cluster Pending</title>
+  </head>
+  <body style='background-color: #f8f8f8;' onload="JavaScript:timedRefresh(10000);">
+    <img src="https://www.h2o.ai/wp-content/themes/h2o2018/templates/dist/images/h2o_logo.svg" style='max-width: 250px; margin-left: auto; margin-right: auto; margin-top: 100px; display: block;'></img>
+    <h1 style='margin-left: auto; text-align: center;font-family: sans-serif;'>Cluster Pending</h1>
+  </body>
+</html>
+EOF
+
+cat << EOF >> /etc/domctl/apps.dominodatalab.com_v1alpha1_h2ocluster.yaml
+hardwareTierId: "large-k8s"
+environmentName: "H2ONode"
+replicaCount: 2
+volumeSize: "32Gi"
+EOF
+
+echo $DOMCTL_KUBECONFIG | base64 -d > /home/ubuntu/.kube/config
+
+cat << EOF >> /home/ubuntu/.jupyter/jupyter_notebook_config.py
+c.ServerProxy.servers = {
+    "H2O": {'command': ['configurable-http-proxy', '--ip', '127.0.0.1', '--port', '{port}', '--default-target=http://h2o-${DOMINO_RUN_ID}.domino-compute.svc.cluster.local:54321', '--error-path', '/usr/share/chp-errors'], 'launcher_entry': {'icon_path': "/home/ubuntu/h2o_logo.svg"}},
+}
+EOF

@@ -1,0 +1,18 @@
+FROM dominodatalab/base:Ubuntu18_DAD_Py3.6_R3.6_20200508
+RUN pip install jupyter-server-proxy
+RUN jupyter labextension install @jupyterlab/server-proxy
+RUN npm install -g configurable-http-proxy
+WORKDIR /home/ubuntu
+RUN wget https://www.h2o.ai/wp-content/themes/h2o2018/templates/dist/images/h2o_logo.svg
+RUN mkdir -p /usr/share/chp-errors && chmod -R 777 /usr/share/chp-errors
+RUN mkdir -p /etc/domctl
+RUN chown -R ubuntu:ubuntu /etc/domctl
+RUN mkdir -p /home/ubuntu/.kibe
+RUN chown -R ubuntu:ubuntu /home/ubuntu/.kube
+WORKDIR /opt
+RUN wget https://domino-kubelet.s3-us-west-2.amazonaws.com/domctl-master.zip && \
+    unzip domctl-master.zip && \ 
+    pip install -e domctl-master && \
+    rm domctl-master.zip
+RUN pip install h2o==3.30.0.5
+RUN R -e 'install.packages("h2o", type="source", repos="http://h2o-release.s3.amazonaws.com/h2o/rel-zahradnik/5/R")'
