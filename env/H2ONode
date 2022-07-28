@@ -1,0 +1,20 @@
+USER root
+
+RUN apt-get update && \
+	apt-get install default-jdk unzip wget -y && \
+        rm -r /var/lib/apt/lists /var/cache/apt/archives
+
+WORKDIR /opt
+
+ARG H2O_VERSION
+ENV H2O_VERSION ${H2O_VERSION:-3.30.0.5}
+
+RUN wget -q http://h2o-release.s3.amazonaws.com/h2o/rel-zahradnik/5/h2o-${H2O_VERSION}.zip && \
+        unzip -q h2o-${H2O_VERSION}.zip && \
+        rm h2o-${H2O_VERSION}.zip && \
+        mv h2o-${H2O_VERSION} h2o && \
+        chmod -R g+rwX h2o
+
+WORKDIR /opt/h2o
+USER 1001
+CMD java -jar /opt/h2o/h2o.jar
